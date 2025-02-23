@@ -1,4 +1,5 @@
-onAfterBootstrap((e) => {
+onBootstrap((e) => {
+  e.next();
   try {
     return require(`pocketpages`).AfterBootstrapHandler(e)
   } catch (e) {

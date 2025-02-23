@@ -20,7 +20,8 @@ export const Init = () => {
   rootCmd.addCommand(UninstallCommand())
   rootCmd.addCommand(ListCommand())
 
-  onAfterBootstrap((e) => {
+  onBootstrap((e) => {
+    e.next();
     require(`pocodex/dist/pb`).InitPluginsHook(e)
   })
 }
