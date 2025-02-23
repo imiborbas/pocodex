@@ -1,15 +1,15 @@
 import * as log from 'pocketbase-log'
-import { PluginConfigured, PluginFactory } from '../../../types'
+import { App, PluginConfigured, PluginFactory } from '../../../types'
 import { getSetting, setSetting } from './settings'
 
-export const loadPlugin = (txDao: daos.Dao, pluginName: string) => {
-  const configuredModule = loadPluginSafeMode(txDao, pluginName)
-  configuredModule.init?.(txDao)
+export const loadPlugin = (app: App, pluginName: string) => {
+  const configuredModule = loadPluginSafeMode(app, pluginName)
+  configuredModule.init?.(app)
   return configuredModule
 }
 
 const PLUGIN_STORE_RECORD_TYPE = `setting`
-export const loadPluginSafeMode = (txDao: daos.Dao, pluginName: string) => {
+export const loadPluginSafeMode = (app: App, pluginName: string) => {
   const module = require(`${pluginName}/dist/plugin`)
   const factory = (module.default || module.plugin || module) as PluginFactory
   if (typeof factory !== 'function') {
@@ -27,7 +27,7 @@ export const loadPluginSafeMode = (txDao: daos.Dao, pluginName: string) => {
           throw new Error(`Updating the store requires a creator function`)
         }
         return setSetting(
-          txDao,
+          app,
           pluginName,
           PLUGIN_STORE_RECORD_TYPE,
           key,
@@ -35,7 +35,7 @@ export const loadPluginSafeMode = (txDao: daos.Dao, pluginName: string) => {
           creator
         )
       } else {
-        return getSetting(txDao, pluginName, PLUGIN_STORE_RECORD_TYPE, key)
+        return getSetting(app, pluginName, PLUGIN_STORE_RECORD_TYPE, key)
       }
     },
   })

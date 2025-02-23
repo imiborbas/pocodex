@@ -21,7 +21,7 @@ export const InstallCommand = () => {
       log(`Installing plugin ${packageSpec}`)
       dbg({ args, force })
 
-      installPlugin($app.dao(), packageSpec, force)
+      installPlugin($app, packageSpec, force)
     },
   })
 

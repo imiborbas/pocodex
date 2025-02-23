@@ -18,6 +18,6 @@ export const UninstallCommand = () =>
       }
       log(`Uninstalling plugin ${packageSpec}`)
 
-      uninstallPlugin($app.dao(), packageSpec)
+      uninstallPlugin($app, packageSpec)
     },
   })

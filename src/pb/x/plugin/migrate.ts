@@ -1,11 +1,11 @@
 import { forEach, keys } from '@s-libs/micro-dash'
 import { dbg, log, warn } from 'pocketbase-log'
-import { PluginConfigured } from '../../../types'
+import { App, PluginConfigured } from '../../../types'
 import { getPluginMeta, setPluginMeta } from './meta'
 
-export const migrateUp = (dao: daos.Dao, plugin: PluginConfigured) => {
+export const migrateUp = (app: App, plugin: PluginConfigured) => {
   log(`Running up migrations for plugin ${plugin.name}`)
-  const value = getPluginMeta(dao, plugin.name)
+  const value = getPluginMeta(app, plugin.name)
   const migrations = plugin.migrations?.()
 
   dbg(`Found migrations:`, keys(migrations))
@@ -16,11 +16,11 @@ export const migrateUp = (dao: daos.Dao, plugin: PluginConfigured) => {
       return
     }
     log(`Running migration ${name}`)
-    dao.runInTransaction((txDao) => {
+    app.runInTransaction((txApp) => {
       dbg(`Running up migration ${name}`)
-      migration.up(txDao.db())
+      migration.up(txApp.db())
       dbg(`Updating meta with migration ${name}`)
-      setPluginMeta(txDao, plugin, (meta) => {
+      setPluginMeta(txApp, plugin, (meta) => {
         dbg(`Adding migration ${name} to meta`, { meta })
         meta.migrations.push(name)
       })
@@ -28,9 +28,9 @@ export const migrateUp = (dao: daos.Dao, plugin: PluginConfigured) => {
   })
 }
 
-export const migrateDown = (dao: daos.Dao, plugin: PluginConfigured) => {
+export const migrateDown = (app: App, plugin: PluginConfigured) => {
   dbg(`Running down migrations for plugin ${plugin.name}`)
-  const meta = getPluginMeta(dao, plugin.name)
+  const meta = getPluginMeta(app, plugin.name)
   const migrations = plugin.migrations?.()
 
   meta?.migrations?.reverse().forEach((name) => {
@@ -39,10 +39,10 @@ export const migrateDown = (dao: daos.Dao, plugin: PluginConfigured) => {
       warn(`Migration ${name} not found - skipping downgrade`)
     }
     dbg(`Running down migration ${name}`)
-    dao.runInTransaction((txDao) => {
-      migration!.down(txDao.db())
+    app.runInTransaction((txApp: core.App) => {
+      migration!.down(txApp.db())
       dbg(`Removing migration  ${name} from meta`)
-      setPluginMeta(txDao, plugin, (meta) => {
+      setPluginMeta(txApp, plugin, (meta) => {
         meta.migrations = meta.migrations.filter((m) => m !== name)
       })
     })

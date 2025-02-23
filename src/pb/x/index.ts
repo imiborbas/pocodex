@@ -28,5 +28,5 @@ export const Init = () => {
 
 export const InitPluginsHook = (e: core.BootstrapEvent) => {
   dbg('InitPluginsHook')
-  initPlugins(e.app.dao())
+  initPlugins(e.app)
 }

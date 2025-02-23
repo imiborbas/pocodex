@@ -10,7 +10,7 @@ export const ListCommand = () => {
 
     run: (cmd, args) => {
       logo()
-      const plugins = getPluginMetas($app.dao())
+      const plugins = getPluginMetas($app)
       log('Plugins:')
 
       plugins.forEach((p) => {

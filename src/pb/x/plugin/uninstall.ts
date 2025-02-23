@@ -6,20 +6,21 @@ import { loadPluginSafeMode } from './load'
 import { deletePluginMeta } from './meta'
 import { migrateDown } from './migrate'
 import { deleteSettings } from './settings'
+import { App } from '../../../types'
 
-export const uninstallPlugin = (dao: daos.Dao, pluginName: string) => {
-  const plugin = loadPluginSafeMode(dao, pluginName)
+export const uninstallPlugin = (app: App, pluginName: string) => {
+  const plugin = loadPluginSafeMode(app, pluginName)
 
-  dao.runInTransaction((txDao) => {
+  app.runInTransaction((txApp: core.App) => {
     log(`Migrating down plugin ${plugin.name}`)
-    migrateDown(txDao, plugin)
+    migrateDown(txApp, plugin)
     log(`Deleting plugin meta for ${plugin.name}`)
-    deletePluginMeta(txDao, plugin.name)
+    deletePluginMeta(txApp, plugin.name)
     log(`Deleting settings owned by ${plugin.name}`)
-    deleteSettings(txDao, plugin.name)
+    deleteSettings(txApp, plugin.name)
     log(`Deleting files for ${plugin.name}`)
     try {
-      forEach(plugin.files?.(txDao), (content, dst) => {
+      forEach(plugin.files?.(txApp), (content, dst) => {
         if (!fs.existsSync(dst)) {
           log(`File ${dst} does not exist, skipping`)
           return

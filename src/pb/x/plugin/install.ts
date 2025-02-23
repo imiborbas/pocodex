@@ -6,9 +6,10 @@ import { loadPlugin } from './load'
 import { hasPluginMeta, initPluginMeta } from './meta'
 import { migrateUp } from './migrate'
 import { uninstallPlugin } from './uninstall'
+import { App } from '../../../types'
 
 export const installPlugin = (
-  dao: daos.Dao,
+  app: App,
   packageSpec: string,
   force: boolean
 ) => {
@@ -18,7 +19,7 @@ export const installPlugin = (
   const packageManager = getPackageManager()
 
   dbg(`Checking for existing plugin meta`)
-  const hasMeta = hasPluginMeta(dao, pluginName)
+  const hasMeta = hasPluginMeta(app, pluginName)
   if (hasMeta) {
     const shouldBlock = hasMeta && !force
 
@@ -27,11 +28,11 @@ export const installPlugin = (
       return
     }
     log(`Force reinstalling plugin ${pluginName}`)
-    uninstallPlugin(dao, pluginName)
+    uninstallPlugin(app, pluginName)
   }
 
   try {
-    dao.runInTransaction((txDao) => {
+    app.runInTransaction((txApp: core.App) => {
       try {
         const output = installPackage(packageManager, packageSpec)
         log(output)
@@ -43,7 +44,7 @@ export const installPlugin = (
       const plugin = (() => {
         try {
           log(`Loading plugin...`)
-          return loadPlugin(txDao, pluginName)
+          return loadPlugin(txApp, pluginName)
         } catch (e) {
           error(`Failed to load plugin ${pluginName}: ${e}`)
           if (`${e}`.match(/invalid module/i)) {
@@ -55,22 +56,22 @@ export const installPlugin = (
 
       try {
         log(`Initializing settings...`)
-        initPluginMeta(txDao, pluginName)
+        initPluginMeta(txApp, pluginName)
       } catch (e) {
         error(`Failed to initialize plugin meta for ${pluginName}: ${e}`)
         throw e
       }
 
       try {
-        migrateUp(txDao, plugin)
+        migrateUp(txApp, plugin)
       } catch (e) {
         error(`Failed to migrate plugin ${pluginName}: ${e}`)
         throw e
       }
 
       try {
-        log(plugin.files?.(txDao))
-        forEach(plugin.files?.(txDao), (content, dst) => {
+        log(plugin.files?.(txApp))
+        forEach(plugin.files?.(txApp), (content, dst) => {
           if (fs.existsSync(dst)) {
             const currentContent = fs.readFileSync(dst, 'utf-8')
             if (currentContent != content) {
