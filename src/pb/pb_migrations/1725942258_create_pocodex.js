@@ -1,85 +1,81 @@
 migrate(
-  (db) => {
+  (app) => {
     const collection = new Collection({
-      id: 'kxhogh0nu8cyokn',
-      name: 'pocodex',
-      type: 'base',
-      system: false,
-      schema: [
+      "id": "kxhogh0nu8cyokn",
+      "name": "pocodex",
+      "type": "base",
+      "system": false,
+      "fields": [
         {
-          system: false,
-          id: 'avyam89v',
-          name: 'owner',
-          type: 'text',
-          required: false,
-          presentable: false,
-          unique: false,
-          options: {
-            min: null,
-            max: null,
-            pattern: '',
-          },
+          "autogeneratePattern": "",
+          "hidden": false,
+          "id": "avyam89v",
+          "max": 4096,
+          "min": 0,
+          "name": "owner",
+          "pattern": "",
+          "presentable": false,
+          "primaryKey": false,
+          "required": true,
+          "system": false,
+          "type": "text"
         },
         {
-          system: false,
-          id: 'adbqji6s',
-          name: 'type',
-          type: 'text',
-          required: true,
-          presentable: false,
-          unique: false,
-          options: {
-            min: null,
-            max: null,
-            pattern: '',
-          },
+          "autogeneratePattern": "",
+          "hidden": false,
+          "id": "adbqji6s",
+          "max": 4096,
+          "min": 0,
+          "name": "type",
+          "pattern": "",
+          "presentable": false,
+          "primaryKey": false,
+          "required": true,
+          "system": false,
+          "type": "text"
         },
         {
-          system: false,
-          id: 'ebc7jrha',
-          name: 'key',
-          type: 'text',
-          required: true,
-          presentable: false,
-          unique: false,
-          options: {
-            min: null,
-            max: null,
-            pattern: '',
-          },
+          "autogeneratePattern": "",
+          "hidden": false,
+          "id": "ebc7jrha",
+          "max": 4096,
+          "min": 0,
+          "name": "key",
+          "pattern": "",
+          "presentable": false,
+          "primaryKey": false,
+          "required": true,
+          "system": false,
+          "type": "text"
         },
         {
-          system: false,
-          id: 'w8tqpoan',
-          name: 'value',
-          type: 'json',
-          required: true,
-          presentable: false,
-          unique: false,
-          options: {
-            maxSize: 2000000,
-          },
-        },
+          "hidden": false,
+          "id": "w8tqpoan",
+          "maxSize": 0,
+          "name": "value",
+          "presentable": false,
+          "required": false,
+          "system": false,
+          "type": "json"
+        }
       ],
-      indexes: [
-        'CREATE UNIQUE INDEX `idx_5XsQQRe` ON `pocodex` (\n  `owner`,\n  `type`,\n  `key`\n)',
-        'CREATE INDEX `idx_jRx0x6O` ON `pocodex` (`owner`)',
-        'CREATE INDEX `idx_MQTYsG2` ON `pocodex` (\n  `owner`,\n  `type`\n)',
+      "indexes": [
+        "CREATE UNIQUE INDEX `idx_5XsQQRe` ON `pocodex` (`owner`, `type`, `key`)",
+        "CREATE INDEX `idx_jRx0x6O` ON `pocodex` (`owner`)",
+        "CREATE INDEX `idx_MQTYsG2` ON `pocodex` (`owner`, `type`)"
       ],
-      listRule: null,
-      viewRule: null,
-      createRule: null,
-      updateRule: null,
-      deleteRule: null,
-      options: {},
+      "listRule": null,
+      "viewRule": null,
+      "createRule": null,
+      "updateRule": null,
+      "deleteRule": null,
     })
 
-    return Dao(db).saveCollection(collection)
+    return app.save(collection)
   },
-  (db) => {
-    const dao = new Dao(db)
-    const collection = dao.findCollectionByNameOrId('kxhogh0nu8cyokn')
+  (app) => {
+    const collection = app.findCollectionByNameOrId("kxhogh0nu8cyokn")
 
-    return dao.deleteCollection(collection)
+    return app.delete(collection)
   }
 )
