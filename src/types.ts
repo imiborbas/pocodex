@@ -1,6 +1,8 @@
 import { WritableDraft } from 'immer'
 import * as log from 'pocketbase-log'
 
+export type App = PocketBase | core.App
+
 export type SettingsCreator<T> = () => T
 export type SettingsUpdater<T> = (value: WritableDraft<T>) => void
 
