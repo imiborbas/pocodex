@@ -27,16 +27,18 @@ function getPackageManager() {
   return `npm` // No lock file found
 }
 
-function installPackage(manager: string, packageName) {
+function installPackage(manager: string, packageSpec: string, link: boolean) {
+  const packageName = packageSpec.split('@')[0]
+  const linkSpec = `${packageName}@link:${packageName}`
   const command =
     manager === 'npm'
-      ? `npm install ${packageName}`
+      ? `npm ${link ? 'link ' + packageName : 'install ' + packageSpec}`
       : manager === 'yarn'
-        ? `yarn add ${packageName}`
+        ? `yarn add ${link ? linkSpec : packageSpec}`
         : manager === 'pnpm'
-          ? `pnpm add ${packageName}`
+          ? `pnpm add ${link ? linkSpec : packageSpec}`
           : manager === 'bun'
-            ? `bun add ${packageName}`
+            ? `bun add ${link ? linkSpec : packageSpec}`
             : null
 
   if (!command) {
@@ -77,10 +79,7 @@ program
         `Use a link: prefix when installing (for local development)`
       )
       .action(({ link }) => {
-        installPackage(
-          getPackageManager(),
-          link ? `pocodex@link:pocodex` : `pocodex@latest`
-        )
+        installPackage(getPackageManager(), 'pocodex@latest', link)
 
         const PACKAGE_ROOT = (...paths: string[]) => join(__dirname, ...paths)
 
